@@ -111,5 +111,29 @@ class TSortTest < Test::Unit::TestCase # :nodoc:
     }
     assert_equal([['4'], ['2', '3'], ['1']], r)
   end
+
+  def test_s_each_strongly_connected_component_from_enum_reuse
+    g = {1=>[2], 2=>[3], 3=>[]}
+    each_child = lambda {|n, &b| g[n].each(&b) }
+    e = TSort.each_strongly_connected_component_from(1, each_child)
+    assert_equal([[3], [2], [1]], e.to_a)
+    assert_equal([[3], [2], [1]], e.to_a)
+  end
+
+  def test_s_each_strongly_connected_component_from_enum_rewind
+    g = {1=>[2], 2=>[3], 3=>[]}
+    each_child = lambda {|n, &b| g[n].each(&b) }
+    e = TSort.each_strongly_connected_component_from(1, each_child)
+    assert_equal([3], e.next)
+    e.rewind
+    assert_equal([3], e.next)
+  end
+
+  def test_each_strongly_connected_component_from_enum_reuse
+    h = TSortHash[{1=>[2], 2=>[3], 3=>[]}]
+    e = h.each_strongly_connected_component_from(1)
+    assert_equal([[3], [2], [1]], e.to_a)
+    assert_equal([[3], [2], [1]], e.to_a)
+  end
 end
 
